@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planes - AI Thesis Generator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .hero-section {
+            text-align: center;
+            color: white;
+            padding: 3rem 0;
+        }
+
+        .hero-section h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .hero-section p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .pricing-container {
+            padding: 2rem 0;
+        }
+
+        .pricing-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: none;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+        }
+
+        .pricing-card.popular {
+            border: 3px solid #2563eb;
+            position: relative;
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(45deg, #2563eb, #3b82f6);
+            color: white;
+            padding: 8px 25px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .price-section {
+            text-align: center;
+            padding: 2rem 0 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .price {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #2563eb;
+            margin-bottom: 0.5rem;
+        }
+
+        .price-period {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .features-list {
+            padding: 2rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.5rem 0;
+        }
+
+        .feature-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-available {
+            color: #10b981;
+        }
+
+        .feature-unavailable {
+            color: #ef4444;
+        }
+
+        .btn-plan {
+            width: 100%;
+            border-radius: 12px;
+            padding: 12px 0;
+            font-weight: 600;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .btn-free {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-free:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+
+        .btn-premium {
+            background: linear-gradient(45deg, #2563eb, #3b82f6);
+            border: none;
+            color: white;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        .comparison-table {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            margin-top: 3rem;
+            overflow: hidden;
+        }
+
+        .table th {
+            background: linear-gradient(45deg, #2563eb, #3b82f6);
+            color: white;
+            font-weight: 600;
+            border: none;
+            padding: 1rem;
+        }
+
+        .table td {
+            padding: 1rem;
+            border-color: #e2e8f0;
+        }
+
+        .back-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+            display: inline-block;
+        }
+
+        .back-link:hover {
+            color: #e2e8f0;
+            transform: translateX(-4px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-primary" href="/">
+                <i class="fas fa-graduation-cap me-2"></i>AI Thesis Generator
+            </a>
+            <div class="navbar-nav ms-auto">
+                {% if session.user_id %}
+                <a class="btn btn-outline-primary btn-sm me-2" href="/dashboard">Dashboard</a>
+                <a class="btn btn-outline-danger btn-sm" href="/logout">Cerrar Sesión</a>
+                {% else %}
+                <a class="btn btn-outline-primary btn-sm" href="/login">Iniciar Sesión</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <a href="/" class="back-link">
+            <i class="fas fa-arrow-left me-2"></i>Volver al inicio
+        </a>
+
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h1>Elige tu Plan</h1>
+            <p>Selecciona el plan que mejor se adapte a tus necesidades académicas. Todos los planes incluyen soporte y actualizaciones.</p>
+        </div>
+
+        <!-- Pricing Cards -->
+        <div class="pricing-container">
+            <div class="row g-4">
+                {% for plan_id, plan in planes.items() %}
+                <div class="col-lg-3 col-md-6">
+                    <div class="pricing-card {% if plan_id == '10' %}popular{% endif %}">
+                        {% if plan_id == '10' %}
+                        <div class="popular-badge">Más Popular</div>
+                        {% endif %}
+
+                        <div class="price-section">
+                            <div class="price">
+                                {% if plan.precio == 0 %}
+                                GRATIS
+                                {% else %}
+                                ${{ plan.precio }}
+                                {% endif %}
+                            </div>
+                            {% if plan.precio > 0 %}
+                            <div class="price-period">por mes</div>
+                            {% endif %}
+                            <h5 class="mt-2">{{ plan.nombre.split('(')[0].strip() }}</h5>
+                            <p class="text-muted">{{ plan.descripcion }}</p>
+                        </div>
+
+                        <div class="features-list">
+                            <!-- Funcionalidades principales -->
+                            {% if plan.funcionalidades.esquema_general %}
+                            <div class="feature-item">
+                                <div class="feature-icon feature-available">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span>Esquema general</span>
+                            </div>
+                            {% endif %}
+
+                            {% if plan.funcionalidades.desarrollo_introduccion %}
+                            <div class="feature-item">
+                                <div class="feature-icon feature-available">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span>Introducción y conclusión</span>
+                            </div>
+                            {% else %}
+                            <div class="feature-item">
+                                <div class="feature-icon feature-unavailable">
+                                    <i class="fas fa-times"></i>
+                                </div>
+                                <span>Introducción y conclusión</span>
+                            </div>
+                            {% endif %}
+
+                            {% if plan.funcionalidades.desarrollo_capitulos %}
+                            <div class="feature-item">
+                                <div class="feature-icon feature-available">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span>Desarrollo de capítulos</span>
+                            </div>
+                            {% else %}
+                            <div class="feature-item">
+                                <div class="feature-icon feature-unavailable">
+                                    <i class="fas fa-times"></i>
+                                </div>
+                                <span>Desarrollo de capítulos</span>
+                            </div>
+                            {% endif %}
+
+                            {% if plan.funcionalidades.portada_personalizada %}
+                            <div class="feature-item">
+                                <div class="feature-icon feature-available">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span>Portada personalizada</span>
+                            </div>
+                            {% else %}
+                            <div class="feature-item">
+                                <div class="feature-icon feature-unavailable">
+                                    <i class="fas fa-times"></i>
+                                </div>
+                                <span>Portada personalizada</span>
+                            </div>
+                            {% endif %}
+
+                            {% if plan.funcionalidades.edicion_online %}
+                            <div class="feature-item">
+                                <div class="feature-icon feature-available">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span>Edición online</span>
+                            </div>
+                            {% else %}
+                            <div class="feature-item">
+                                <div class="feature-icon feature-unavailable">
+                                    <i class="fas fa-times"></i>
+                                </div>
+                                <span>Edición online</span>
+                            </div>
+                            {% endif %}
+
+                            {% if plan.funcionalidades.trabajo_completo %}
+                            <div class="feature-item">
+                                <div class="feature-icon feature-available">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span>Trabajo completo</span>
+                            </div>
+                            {% else %}
+                            <div class="feature-item">
+                                <div class="feature-icon feature-unavailable">
+                                    <i class="fas fa-times"></i>
+                                </div>
+                                <span>Trabajo completo</span>
+                            </div>
+                            {% endif %}
+
+                            {% if plan.funcionalidades.revision_estilo %}
+                            <div class="feature-item">
+                                <div class="feature-icon feature-available">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <span>Revisión de estilo</span>
+                            </div>
+                            {% else %}
+                            <div class="feature-item">
+                                <div class="feature-icon feature-unavailable">
+                                    <i class="fas fa-times"></i>
+                                </div>
+                                <span>Revisión de estilo</span>
+                            </div>
+                            {% endif %}
+
+                            <!-- Limitaciones del plan -->
+                            <div class="feature-item mt-3 pt-3" style="border-top: 1px solid #e2e8f0;">
+                                <div class="feature-icon feature-available">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <span>Hasta {{ plan.limitaciones.max_paginas }} páginas</span>
+                            </div>
+
+                            {% if plan.limitaciones.max_archivos_mes != 'ilimitado' %}
+                            <div class="feature-item">
+                                <div class="feature-icon feature-available">
+                                    <i class="fas fa-upload"></i>
+                                </div>
+                                <span>{{ plan.limitaciones.max_archivos_mes }} archivos/mes</span>
+                            </div>
+                            {% else %}
+                            <div class="feature-item">
+                                <div class="feature-icon feature-available">
+                                    <i class="fas fa-infinity"></i>
+                                </div>
+                                <span>Archivos ilimitados</span>
+                            </div>
+                            {% endif %}
+
+                            <div class="feature-item">
+                                <div class="feature-icon feature-available">
+                                    <i class="fas fa-headset"></i>
+                                </div>
+                                <span>Soporte {{ plan.limitaciones.soporte }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Botón de selección -->
+                        {% if session.user_id %}
+                            {% if plan_id == 'gratis' %}
+                            <button class="btn btn-plan btn-free" onclick="seleccionarPlan('gratis')">
+                                Plan Actual
+                            </button>
+                            {% else %}
+                            <button class="btn btn-plan btn-premium" onclick="seleccionarPlan('{{ plan_id }}')">
+                                Suscribirse Ahora
+                            </button>
+                            {% endif %}
+                        {% else %}
+                        <a href="/login" class="btn btn-plan btn-premium">
+                            Iniciar Sesión para Suscribirse
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Tabla de Comparación -->
+        <div class="comparison-table">
+            <h3 class="text-center mb-4 p-4">Comparación Detallada de Funcionalidades</h3>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Funcionalidad</th>
+                            <th class="text-center">Gratis</th>
+                            <th class="text-center">$5/mes</th>
+                            <th class="text-center">$10/mes</th>
+                            <th class="text-center">$20/mes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Generar esquema general</td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Subir PDF inicial</td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Plantilla de portada básica</td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Desarrollo de introducción</td>
+                            <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Portada personalizada (.docx)</td>
+                            <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Desarrollo de capítulos</td>
+                            <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                            <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Edición online</td>
+                            <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                            <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Trabajo completo</td>
+                            <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                            <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                            <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                        </tr>
+                        <tr>
+                            <td>Revisión de estilo</td>
+                            <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                            <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                            <td class="text-center"><i class="fas fa-times text-danger"></i></td>
+                            <td class="text-center"><i class="fas fa-check text-success"></i></td>
+                        </tr>
+                        <tr class="table-info">
+                            <td><strong>Páginas máximas</strong></td>
+                            <td class="text-center"><strong>5</strong></td>
+                            <td class="text-center"><strong>12</strong></td>
+                            <td class="text-center"><strong>25</strong></td>
+                            <td class="text-center"><strong>50</strong></td>
+                        </tr>
+                        <tr class="table-info">
+                            <td><strong>Archivos por mes</strong></td>
+                            <td class="text-center"><strong>3</strong></td>
+                            <td class="text-center"><strong>10</strong></td>
+                            <td class="text-center"><strong>25</strong></td>
+                            <td class="text-center"><strong>Ilimitado</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        const usuarioAutenticado = {{ 'true' if session.get('user_id') else 'false' }};
+    </script>
+    
+    <script>
+
+            function seleccionarPlan(planId) {
+                if (!usuarioAutenticado) {
+                    window.location.href = '/login';
+                    return;
+                }
+
+                if (planId === 'gratis') {
+                    alert('Ya tienes el plan gratuito activo');
+                    return;
+                }
+
+                const planNames = {
+                    '5': 'Básico ($5/mes)',
+                    '10': 'Intermedio ($10/mes)', 
+                    '20': 'Completo ($20/mes)'
+                };
+
+                if (confirm(`¿Deseas suscribirte al plan ${planNames[planId]}?`)) {
+                    fetch('/actualizar_plan', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ plan: planId })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('¡Suscripción exitosa! Redirigiendo al dashboard...');
+                            window.location.href = '/dashboard';
+                        } else {
+                            alert('Error al procesar suscripción: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Error de conexión. Intenta nuevamente.');
+                    });
+                }
+            }
+
+    </script>
+</body>
+</html>

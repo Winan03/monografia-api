@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AI Thesis Generator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .container-fluid {
+            padding: 2rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: none;
+            margin-bottom: 2rem;
+        }
+
+        .plan-badge {
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            background: linear-gradient(45deg, #2563eb, #3b82f6);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #2563eb, #3b82f6);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        .form-control {
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+        }
+
+        .feature-disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .upgrade-notice {
+            background: linear-gradient(45deg, #f59e0b, #f97316);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .history-item {
+            border-left: 4px solid #2563eb;
+            padding-left: 15px;
+            margin-bottom: 15px;
+        }
+
+        #loadingModal .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: none;
+        }
+
+        .spinner-border {
+            color: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand fw-bold text-primary" href="/">
+                <i class="fas fa-graduation-cap me-2"></i>AI Thesis Generator
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="nav-text me-3">{{ session.user_email }}</span>
+                <a class="btn btn-outline-danger btn-sm" href="/logout">
+                    <i class="fas fa-sign-out-alt me-1"></i>Cerrar Sesión
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Panel Principal -->
+            <div class="col-lg-8">
+                <div class="card position-relative">
+                    <div class="plan-badge">Plan {{ user_plan.upper() if user_plan != 'gratis' else 'GRATIS' }}</div>
+                    <div class="card-body p-4">
+                        <h3 class="card-title mb-4">
+                            <i class="fas fa-file-alt me-2 text-primary"></i>
+                            Generar Nueva Monografía
+                        </h3>
+
+                        {% if user_plan == 'gratis' %}
+                        <div class="upgrade-notice">
+                            <i class="fas fa-star me-2"></i>
+                            Estás usando el plan gratuito. <a href="/planes" class="text-white fw-bold">¡Actualiza para desbloquear más funciones!</a>
+                        </div>
+                        {% endif %}
+
+                        <form id="monografiaForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-semibold">Tema de la Monografía *</label>
+                                    <input type="text" class="form-control" name="tema" required 
+                                           placeholder="Ej: Inteligencia Artificial en la Educación">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-semibold">Carrera/Curso</label>
+                                    <input type="text" class="form-control" name="carrera" 
+                                           placeholder="Ej: Ingeniería de Sistemas">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-semibold">Nivel Académico</label>
+                                    <select class="form-control" name="nivel">
+                                        <option value="pregrado">Pregrado</option>
+                                        <option value="posgrado">Posgrado</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-semibold">Extensión (páginas)</label>
+                                    <input type="number" class="form-control" name="extension" 
+                                           min="5" max="50" value="10">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label fw-semibold">Formato de Citación</label>
+                                    <select class="form-control" name="formato_cita">
+                                        <option value="APA">APA</option>
+                                        <option value="MLA">MLA</option>
+                                        <option value="Chicago">Chicago</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    Subir PDF de referencia (opcional)
+                                    {% if not funcionalidades.subir_pdf %}
+                                    <span class="badge bg-warning">Plan requerido</span>
+                                    {% endif %}
+                                </label>
+                                <input type="file" class="form-control" name="archivo_pdf" 
+                                       accept=".pdf" {% if not funcionalidades.subir_pdf %}disabled{% endif %}>
+                                <div class="form-text">Sube un PDF para que el sistema lo use como referencia</div>
+                            </div>
+
+                            {% if funcionalidades.portada_personalizada %}
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">
+                                    Portada Personalizada (.docx)
+                                    <span class="badge bg-success">Disponible</span>
+                                </label>
+                                <input type="file" class="form-control" name="portada_docx" accept=".docx">
+                                <div class="form-text">Sube un archivo Word con tu portada personalizada</div>
+                            </div>
+                            {% endif %}
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-magic me-2"></i>Generar Monografía
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel Lateral -->
+            <div class="col-lg-4">
+                <!-- Funcionalidades Disponibles -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-check-circle me-2 text-success"></i>
+                            Funcionalidades Disponibles
+                        </h5>
+                        <ul class="list-unstyled">
+                            {% for func, disponible in funcionalidades.items() %}
+                            <li class="mb-2">
+                                {% if disponible %}
+                                <i class="fas fa-check text-success me-2"></i>
+                                {% else %}
+                                <i class="fas fa-times text-danger me-2"></i>
+                                {% endif %}
+                                {{ func.replace('_', ' ').title() }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        <a href="/planes" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-arrow-up me-1"></i>Actualizar Plan
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Historial -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-history me-2 text-primary"></i>
+                            Historial Reciente
+                        </h5>
+                        {% if monografias %}
+                            {% for monografia in monografias[:5] %}
+                            <div class="history-item">
+                                <h6 class="mb-1">{{ monografia[0] }}</h6>
+                                <p class="text-muted mb-1">{{ monografia[1] }}</p>
+                                <small class="text-muted">{{ monografia[2] }}</small>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <p class="text-muted">No hay monografías generadas aún.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Progreso -->
+    <div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center p-4">
+                    <div class="spinner-border mb-3" style="width: 3rem; height: 3rem;"></div>
+                    <h5>Generando Monografía...</h5>
+                    <p class="text-muted">Esto puede tomar algunos minutos</p>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             style="width: 0%" id="progressBar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Resultado -->
+    <div class="modal fade" id="resultModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Monografía Generada</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="resultContent">
+                    <!-- Contenido generado se mostrará aquí -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="downloadPdf">
+                        <i class="fas fa-download me-2"></i>Descargar PDF
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('monografiaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+            const resultModal = new bootstrap.Modal(document.getElementById('resultModal'));
+            
+            // Mostrar modal de carga
+            loadingModal.show();
+            
+            // Simular progreso
+            let progress = 0;
+            const progressBar = document.getElementById('progressBar');
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 90) progress = 90;
+                progressBar.style.width = progress + '%';
+            }, 1000);
+            
+            // Enviar solicitud
+            fetch('/generar', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                clearInterval(interval);
+                progressBar.style.width = '100%';
+                
+                setTimeout(() => {
+                    loadingModal.hide();
+                    
+                    if (data.success) {
+                        // Mostrar resultado
+                        document.getElementById('resultContent').innerHTML = `
+                            <div class="alert alert-success">
+                                <h6>¡Monografía generada exitosamente!</h6>
+                                <p><strong>Título:</strong> ${data.monografia.titulo}</p>
+                                <p><strong>Plan usado:</strong> ${data.plan}</p>
+                            </div>
+                            <div class="bg-light p-3 rounded">
+                                <h6>Vista previa:</h6>
+                                <p>${data.monografia.preview || 'Contenido generado correctamente'}</p>
+                            </div>
+                        `;
+                        resultModal.show();
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                }, 500);
+            })
+            .catch(error => {
+                clearInterval(interval);
+                loadingModal.hide();
+                alert('Error al generar monografía: ' + error.message);
+            });
+        });
+    </script>
+</body>
+</html>

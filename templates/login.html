@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - AI Thesis Generator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 3rem;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .brand-logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .brand-logo i {
+            font-size: 3rem;
+            color: #2563eb;
+            margin-bottom: 1rem;
+        }
+
+        .brand-title {
+            color: #1e293b;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .brand-subtitle {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            padding: 12px 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #2563eb, #3b82f6);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 0;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+        }
+
+        .nav-tabs {
+            border: none;
+            margin-bottom: 2rem;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            border-radius: 12px;
+            color: #64748b;
+            font-weight: 600;
+            padding: 12px 24px;
+            margin-right: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(45deg, #2563eb, #3b82f6);
+            color: white;
+        }
+
+        .alert {
+            border-radius: 12px;
+            border: none;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .divider span {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 0 1rem;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .social-login {
+            display: grid;
+            gap: 12px;
+        }
+
+        .btn-social {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-social:hover {
+            border-color: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .back-link {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #e2e8f0;
+            transform: translateX(-4px);
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-link">
+        <i class="fas fa-arrow-left me-2"></i>Volver al inicio
+    </a>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="brand-logo">
+                <i class="fas fa-graduation-cap"></i>
+                <h2 class="brand-title">AI Thesis Generator</h2>
+                <p class="brand-subtitle">Accede a tu cuenta para continuar</p>
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs justify-content-center" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-bs-toggle="tab" href="#login">Iniciar Sesión</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="tab" href="#register">Registrarse</a>
+                </li>
+            </ul>
+
+            <!-- Tab content -->
+            <div class="tab-content">
+                <!-- Login Tab -->
+                <div class="tab-pane fade show active" id="login">
+                    <form method="POST" action="/login">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Email</label>
+                            <input type="email" class="form-control" name="email" required 
+                                   placeholder="tu@email.com">
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Contraseña</label>
+                            <input type="password" class="form-control" name="password" required 
+                                   placeholder="••••••••">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mb-3">
+                            <i class="fas fa-sign-in-alt me-2"></i>Iniciar Sesión
+                        </button>
+                    </form>
+
+                    <div class="divider">
+                        <span>o continúa con</span>
+                    </div>
+
+                    <div class="social-login">
+                        <button class="btn btn-social" onclick="alert('Próximamente disponible')">
+                            <i class="fab fa-google me-2 text-danger"></i>Google
+                        </button>
+                        <button class="btn btn-social" onclick="alert('Próximamente disponible')">
+                            <i class="fab fa-github me-2 text-dark"></i>GitHub
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Register Tab -->
+                <div class="tab-pane fade" id="register">
+                    <form method="POST" action="/register" id="registerForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Email</label>
+                            <input type="email" class="form-control" name="email" required 
+                                   placeholder="tu@email.com">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Contraseña</label>
+                            <input type="password" class="form-control" name="password" id="password" required 
+                                   placeholder="••••••••" minlength="6">
+                            <div class="form-text">Mínimo 6 caracteres</div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold">Confirmar Contraseña</label>
+                            <input type="password" class="form-control" id="confirmPassword" required 
+                                   placeholder="••••••••">
+                            <div class="invalid-feedback">Las contraseñas no coinciden</div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="acceptTerms" required>
+                                <label class="form-check-label" for="acceptTerms">
+                                    Acepto los <a href="#" class="text-primary">términos y condiciones</a>
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 mb-3">
+                            <i class="fas fa-user-plus me-2"></i>Crear Cuenta
+                        </button>
+                    </form>
+
+                    <div class="divider">
+                        <span>o regístrate con</span>
+                    </div>
+
+                    <div class="social-login">
+                        <button class="btn btn-social" onclick="alert('Próximamente disponible')">
+                            <i class="fab fa-google me-2 text-danger"></i>Google
+                        </button>
+                        <button class="btn btn-social" onclick="alert('Próximamente disponible')">
+                            <i class="fab fa-github me-2 text-dark"></i>GitHub
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Validación de contraseñas en tiempo real
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
+            
+            if (password !== confirmPassword) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+
+        // Validación del formulario de registro
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                document.getElementById('confirmPassword').classList.add('is-invalid');
+                alert('Las contraseñas no coinciden');
+                return false;
+            }
+        });
+    </script>
+</body>
+</html>

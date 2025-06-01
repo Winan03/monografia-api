@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Monografías - AI Thesis Generator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #3b82f6;
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .hero-section {
+            padding: 80px 0;
+            text-align: center;
+            color: white;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-color), var(--accent-color));
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 2rem;
+            height: 100%;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .pricing-section {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 4rem 0;
+        }
+
+        .upload-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--success-color);
+            background-color: rgba(5, 150, 105, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/">
+                <i class="fas fa-graduation-cap me-2"></i>AI Thesis Generator
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="#features">Características</a>
+                <a class="nav-link" href="#pricing">Planes</a>
+                <a class="nav-link" href="/login">Iniciar Sesión</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <h1 class="hero-title">Genera Monografías Universitarias con IA</h1>
+            <p class="hero-subtitle">Crea trabajos académicos profesionales en minutos, no en semanas</p>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-body p-4">
+                            <form id="monografiaForm" enctype="multipart/form-data">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-semibold">Tema de la Monografía *</label>
+                                        <input type="text" class="form-control" id="tema" name="tema" 
+                                               placeholder="Ej: Impacto de la IA en la Educación" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-semibold">Carrera/Curso</label>
+                                        <input type="text" class="form-control" id="carrera" name="carrera" 
+                                               placeholder="Ej: Ingeniería de Sistemas">
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-semibold">Nivel Académico</label>
+                                        <select class="form-select" id="nivel" name="nivel">
+                                            <option value="pregrado">Pregrado</option>
+                                            <option value="posgrado">Posgrado</option>
+                                            <option value="maestria">Maestría</option>
+                                            <option value="doctorado">Doctorado</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-semibold">Extensión (páginas)</label>
+                                        <select class="form-select" id="extension" name="extension">
+                                            <option value="8">8-10 páginas</option>
+                                            <option value="15" selected>12-15 páginas</option>
+                                            <option value="20">18-20 páginas</option>
+                                            <option value="30">25-30 páginas</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label class="form-label fw-semibold">Formato de Citas</label>
+                                        <select class="form-select" id="formato_cita" name="formato_cita">
+                                            <option value="APA" selected>APA</option>
+                                            <option value="MLA">MLA</option>
+                                            <option value="Chicago">Chicago</option>
+                                            <option value="IEEE">IEEE</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label fw-semibold">Subir Documento de Referencia (Opcional)</label>
+                                    <div class="upload-area" id="uploadArea">
+                                        <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                        <p class="mb-0">Arrastra tu PDF o DOCX aquí, o <span class="text-primary">haz clic para seleccionar</span></p>
+                                        <small class="text-muted">Formatos: PDF, DOCX | Máximo: 16MB</small>
+                                        <input type="file" class="d-none" id="archivo_pdf" name="archivo_pdf" 
+                                               accept=".pdf,.docx">
+                                    </div>
+                                    <div id="fileInfo" class="mt-2" style="display: none;">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-file me-2"></i>
+                                            <span id="fileName"></span>
+                                            <button type="button" class="btn-close float-end" id="removeFile"></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-center">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-magic me-2"></i>Generar Monografía
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-robot feature-icon"></i>
+                            <h5>IA Avanzada</h5>
+                            <p>Generación inteligente de contenido académico usando modelos de última generación</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-book-open feature-icon"></i>
+                            <h5>Formato Académico</h5>
+                            <p>Estructura profesional con citas, referencias y formato universitario</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-lightning-bolt feature-icon"></i>
+                            <h5>Generación Rápida</h5>
+                            <p>Obtén tu monografía completa en minutos, no en días</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <div class="card feature-card">
+                        <div class="card-body">
+                            <i class="fas fa-edit feature-icon"></i>
+                            <h5>Edición Online</h5>
+                            <p>Edita y personaliza tu trabajo directamente en el navegador</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-5">
+        <div class="container">
+            <div class="pricing-section">
+                <h2 class="text-center text-white mb-5">Elige tu Plan</h2>
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body text-center p-4">
+                                <h5 class="card-title">Gratuito</h5>
+                                <div class="display-4 fw-bold text-primary">$0</div>
+                                <p class="text-muted">por mes</p>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>Esquema básico</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Hasta 5 páginas</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>3 monografías/mes</li>
+                                </ul>
+                                <button class="btn btn-outline-primary">Comenzar Gratis</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="card border-primary">
+                            <div class="card-body text-center p-4">
+                                <h5 class="card-title">Básico</h5>
+                                <div class="display-4 fw-bold text-primary">$5</div>
+                                <p class="text-muted">por mes</p>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>Todo lo gratuito</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Hasta 12 páginas</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Portada personalizada</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>10 monografías/mes</li>
+                                </ul>
+                                <button class="btn btn-primary">Suscribirse</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body text-center p-4">
+                                <h5 class="card-title">Intermedio</h5>
+                                <div class="display-4 fw-bold text-primary">$10</div>
+                                <p class="text-muted">por mes</p>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>Todo lo anterior</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Hasta 25 páginas</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Edición online</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>25 monografías/mes</li>
+                                </ul>
+                                <button class="btn btn-primary">Suscribirse</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="card border-warning">
+                            <div class="card-body text-center p-4">
+                                <span class="badge bg-warning text-dark mb-2">Recomendado</span>
+                                <h5 class="card-title">Completo</h5>
+                                <div class="display-4 fw-bold text-primary">$20</div>
+                                <p class="text-muted">por mes</p>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>Todo incluido</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Hasta 50 páginas</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Soporte prioritario</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Monografías ilimitadas</li>
+                                </ul>
+                                <button class="btn btn-warning">Suscribirse</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Loading Modal -->
+    <div class="modal fade" id="loadingModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center p-5">
+                    <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;"></div>
+                    <h5>Generando tu monografía...</h5>
+                    <p class="text-muted">Esto puede tomar unos minutos. Por favor, no cierres esta ventana.</p>
+                    <div class="progress mt-3">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             style="width: 0%" id="progressBar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // File upload functionality
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('archivo_pdf');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const removeFile = document.getElementById('removeFile');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                showFileInfo(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                showFileInfo(e.target.files[0]);
+            }
+        });
+
+        removeFile.addEventListener('click', () => {
+            fileInput.value = '';
+            fileInfo.style.display = 'none';
+        });
+
+        function showFileInfo(file) {
+            fileName.textContent = file.name;
+            fileInfo.style.display = 'block';
+        }
+
+        // Form submission
+        document.getElementById('monografiaForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+            const progressBar = document.getElementById('progressBar');
+            
+            loadingModal.show();
+            
+            // Simulate progress
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 90) progress = 90;
+                progressBar.style.width = progress + '%';
+            }, 500);
+
+            try {
+                const response = await fetch('/generar', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                clearInterval(progressInterval);
+                progressBar.style.width = '100%';
+                
+                if (result.success) {
+                    setTimeout(() => {
+                        loadingModal.hide();
+                        // Redirect to results or show success message
+                        window.location.href = '/dashboard';
+                    }, 1000);
+                } else {
+                    loadingModal.hide();
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                clearInterval(progressInterval);
+                loadingModal.hide();
+                alert('Error al generar la monografía. Por favor, intenta de nuevo.');
+            }
+        });
+    </script>
+</body>
+</html>

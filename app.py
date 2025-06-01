@@ -10,8 +10,9 @@ from generador import GeneradorMonografia
 from planes import PlanesManager
 import sqlite3
 
+
 app = Flask(__name__)
-app.secret_key = 'tu_clave_secreta_aqui'
+app.secret_key = os.getenv('SECRET_KEY', 'clave_de_backup')
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['GENERATED_FOLDER'] = 'generated'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
@@ -19,6 +20,11 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
 # Crear directorios necesarios
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 os.makedirs(app.config['GENERATED_FOLDER'], exist_ok=True)
+
+
+from flask_cors import CORS
+
+CORS(app, supports_credentials=True)
 
 # Configuración de base de datos SQLite
 def init_db():
